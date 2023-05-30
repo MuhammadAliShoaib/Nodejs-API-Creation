@@ -152,13 +152,18 @@ const http = require("http")
 const express = require("express");
 
 const app = express();
+const cors= require("cors")
+require("dotenv").config();
+const mongoose = require("mongoose")
+app.use(express.json());
+app.use(cors({
+    origin: 'http://localhost:3000' 
+  }));
 const Student = require("./routes/studentRoute");
 const Teacher = require("./routes/teacherRoute");
 const Institute = require("./routes/instituteRoute");
 const Course = require("./routes/courseRoute");
-require("dotenv").config();
-const mongoose = require("mongoose")
-app.use(express.json());
+
 
 app.use("/api/Student", Student);
 app.use("/api/Teacher", Teacher);

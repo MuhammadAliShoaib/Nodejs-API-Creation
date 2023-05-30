@@ -20,6 +20,21 @@ route.get('/', async (req, res) => {
     }
 });
 
+route.get("/search", async (req, res) => {
+    let { firstName, LastName } = req.body;
+    if (firstName) {
+      let result = await StudentModel.find({
+        firstName: firstName,
+        LastName: LastName,
+      });
+      if (!result) {
+        res.send(sendResponse(false, null, "No Data Found")).status(404);
+      } else {
+        res.send(sendResponse(true, result)).status(200);
+      }
+    }
+  });
+
 route.get("/:id", async (req, res) => {
     try {
         let id = req.params.id
@@ -75,50 +90,44 @@ route.put("/:id", async (req, res) => {
         let id = req.params.id;
         let result = await StudentModel.findById(id);
         if (!result) {
-            res.send(sendResponse(false, null, "Data not found")).status(400)
+            res.send(sendResponse(false, null, "No Data Found")).status(400);
         } else {
-            let updateResult = await StudentModel.findByIdAndUpdate(id, req.body, { new: true }).status(200)
-        }
-        if (!updateResult) {
-            res.send(sendResponse(false, null, "Error")).status(400)
-        } else {
-            res.send(sendResponse(false, updateResult, "Updated Successfully")).status(200)
+            let updateResult = await StudentModel.findByIdAndUpdate(id, req.body, {
+                new: true,
+            });
+            if (!updateResult) {
+                res.send(sendResponse(false, null, "Error")).status(404);
+            } else {
+                res
+                    .send(sendResponse(true, updateResult, "Updated Successfully"))
+                    .status(200);
+            }
         }
     } catch (e) {
         res.send(sendResponse(false, null, "Error")).status(400);
     }
-})
+});
 
 route.delete("/:id", async (req, res) => {
     try {
         let id = req.params.id
         let result = await StudentModel.findById(id);
         if (!result) {
-            res.send(sendResponse(false, null, "Data not found on this id")).status(400)
+            res.send(sendResponse(false, null, "Data not found on this id")).status(404)
         } else {
-            let deleteResult = await StudentModel.findByIdAndDelete(id).status(200)
+            let deleteResult = await StudentModel.findByIdAndDelete(id)
+            if (!deleteResult) {
+                res.send(sendResponse(false, null, "Error")).status(400)
+            } else {
+                res.send(sendResponse(false, null, "Deleted Successfully")).status(200)
+            }
         }
-        if (!deleteResult) {
-            res.send(sendResponse(false, null, "Error")).status(400)
-        } else {
-            res.send(sendResponse(false, null, "Deleted Successfully")).status(200)
-        }
+        
     } catch (e) {
         res.send(sendResponse(false, null, "Error")).status(400);
     }
 })
 
-route.get("/search", async (req, res)=>{
-    let { firstName,lastName } = req.body;
-    if (firstName) {
-        let result = await StudentModel.find({ firstName: firstName,lastName:lastName });
-        if (!result) {
-            res.send(sendResponse(false, null, "Data not found")).status(400)
-        } else {
-            res.send(sendResponse(true, result)).status(400)
-        }
-    }
-})
 
 module.exports = route;
 
